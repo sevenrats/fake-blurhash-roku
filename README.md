@@ -1,2 +1,3 @@
-# fake-blurhash-roku
-Not quite an implementation of the Blurhash algorithm by Dag Agren.
+# worse-blurhash-decoder
+
+Not exactly an implementation of Dag Agren's Blurhash  Decoder for Roku
