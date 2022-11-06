@@ -1,7 +1,50 @@
-'' Largely based on the work of Neil Burrows: https://github.com/neilsb
+'' Functions rdRightShift and rdINTtoHEX are borrowed from librokudev and arecovered
+'' by the license at https://github.com/sumitk/librokudev/blob/master/LICENSE
 
-'' call "render(blurhash, width, height) and it will return a uri in tmp://"
+'' Otherwise, largely based on the work of Neil Burrows: https://github.com/neilsb
 
+'' call "renderBlurhash(blurhash, width, height) and it will return a uri in tmp://"
+
+
+function rdRightShift(num as integer, count = 1 as integer) as integer
+  mult = 2 ^ count
+  summand = 1
+  total = 0
+  for i = count to 31
+    if num and summand * mult
+      total = total + summand
+    end if
+    summand = summand * 2
+  end for
+  return total
+end function
+
+function rdINTtoHEX(num as integer) as object
+  ba = CreateObject("roByteArray")
+  ba.setresize(4, false)
+  ba[0] = rdRightShift(num, 24)
+  ba[1] = rdRightShift(num, 16)
+  ba[2] = rdRightShift(num, 8)
+  ba[3] = num ' truncates
+  return ba.toHexString().Right(2)
+end function
+
+function bitmapImageByteArray(numX as integer, numY as integer, pixels)
+  bmp = "424D4C000000000000001A0000000C000000"
+  bmp = bmp + rdINTtoHEX(numX) + "00" + rdINTtoHEX(numY) + "0001001800"
+  for r = 0 to numY - 1
+    row = ""
+    for c = 0 to numX - 1
+      row = pixels.RemoveTail() + row
+      ' to do: pad rows which are not 4 in length
+    end for
+    bmp = bmp + row
+  end for
+  bmp = bmp + "0000"
+  ba = CreateObject("roByteArray")
+  ba.fromhexstring(bmp)
+  return ba
+end function
 
 function decode83(str as string) as integer
   digitCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#$%*+,-.:;=?@[]^_{|}~"
@@ -89,15 +132,15 @@ function linearTosRGB(value as float)
   end if
 
   if v <= 0.0031308
-    return Cint(v * 12.92 * 255 + 0.5)
+    return rdINTtoHEX(Cint(v * 12.92 * 255 + 0.5))
   else
-    return Cint((1.055 * (v ^ (1 / 2.4)) - 0.055) * 255 + 0.5)
+    return rdINTtoHEX(Cint((1.055 * (v ^ (1 / 2.4)) - 0.055) * 255 + 0.5))
   end if
 end function
 
 
 
-function render(blurhash as string, width as integer, height as integer, punch = 1 as float)
+function renderBlurhash(blurhash as string, width as integer, height as integer, punch = 1 as float)
   bhfn = CreateObject("roByteArray")
   bhfn.FromAsciiString(blurhash)
   digest = CreateObject("roEVPDigest")
@@ -149,10 +192,10 @@ function render(blurhash as string, width as integer, height as integer, punch =
         b = b + color[2] * basis
       end for
     end for
-    pixel = [linearTosRGB(r), linearTosRGB(g), linearTosRGB(b)] ' our bitmap format wants bgr
+    pixel = linearTosRGB(b) + linearTosRGB(g) + linearTosRGB(r) ' our bitmap format wants bgr
     pixels.push(pixel)
   end for
-  ba = simplebmp_bytearray(numX, numY, pixels)
+  ba = bitmapImageByteArray(numX, numY, pixels)
   ba.WriteFile("tmp://" + fn + ".bmp")
   return "tmp://" + fn + ".bmp"
 end function
