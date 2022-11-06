@@ -140,7 +140,7 @@ end function
 
 
 
-function renderBlurhash(blurhash as string, width as integer, height as integer, punch = 1 as float)
+function render(blurhash as string, width as integer, height as integer, punch = 1 as float)
   bhfn = CreateObject("roByteArray")
   bhfn.FromAsciiString(blurhash)
   digest = CreateObject("roEVPDigest")
