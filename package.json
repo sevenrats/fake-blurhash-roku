@@ -1,7 +1,6 @@
 {
   "dependencies": {
-    "ropm": "^0.10.10",
-    "simple-bmp": "^0.0.0"
+    "ropm": "^0.10.10"
   },
   "name": "fake-blurhash",
   "ropm": {
@@ -11,8 +10,9 @@
     "src/source/fake-blurhash.brs"
   ],
   "description": "Not exactly an implementation of Dag Agren's Blurhash  Decoder for Roku",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": "index.js",
+  "devDependencies": {},
   "scripts": {
     "test": "\"echo \\\"Error: no test specified\\\" && exit 1\""
   },
