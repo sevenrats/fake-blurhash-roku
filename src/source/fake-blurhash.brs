@@ -3,7 +3,7 @@
 
 '' Otherwise, largely based on the work of Neil Burrows: https://github.com/neilsb
 
-'' call "renderBlurhash(blurhash, width, height) and it will return a uri in tmp://"
+'' call "fakeblurhash_render(blurhash, width, height) and it will return a uri in tmp://"
 
 
 function rdRightShift(num as integer, count = 1 as integer) as integer
